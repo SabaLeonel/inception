@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  nginx:
+    container: nginx
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
+    networks: 
+      - network
+
+  mariadb:
+    container: mariadb
+    build: ./requirements/mariadb
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+    networks:
+      - network
+    env_file:
+      - .env
+
+  wordpress:
+    container: wordpress
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - wordpress_data:/var/www/html
+    env_file:
+      - .env
+    networks:
+      - network
+
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/lsaba-qu/data/wordpress
+      o: bind
+
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/lsaba-qu/data/mysql
+      o: bind
+
+networks:
+  network:
+    driver: bridge
