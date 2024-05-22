@@ -1,53 +1,17 @@
-# Makefile for docker-compose
+all:
+	docker compose -f ./srcs/docker-compose.yml up -d --build --force-recreate
 
-# all commands
-
-# create and start containers
-all: up
-
-# stop and remove containers, networks, images, and volumes
-up:
-	@docker-compose up -d
-
-# stop and remove containers, networks, images, and volumes
 down:
-	@docker-compose down
+	docker compose -f ./srcs/docker-compose.yml down
 
-# start containers
-start:
-	@docker-compose start
+re:
+	docker compose -f srcs/docker-compose.yml up -d --build --force-recreate
 
-# stop containers
-stop:
-	@docker-compose stop
 
-# restart containers
-restart:
-	@docker-compose restart
+clean:
+	-docker stop $(docker ps -qa)
+	-docker rm $(docker ps -qa)
+	-docker rmi -f $(docker images -qa)
+	-docker volume rm $(docker volume ls -q) 2 >/dev/null
 
-# Build images
-build:
-	@docker-compose build
-
-# View output from containers
-logs:
-	@docker-compose logs -f
-
-# List containers
-ps:
-	@docker-compose ps
-
-# Run a command in a running container
-exec:
-	@docker-compose exec app bash
-
-# pull images from a registry
-pull:
-	@docker-compose pull
-
-# push images to a registry
-push:
-	@docker-compose push
-
-status:
-	@docker ps
+.PHONY: all re down clean

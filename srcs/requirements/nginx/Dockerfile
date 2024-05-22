@@ -1,9 +1,7 @@
 FROM debian:buster
 
-RUN apt-get update && apt-get install nginx -y && apt install openssl -y
+RUN apt-get update && apt-get install -y nginx && apt install openssl -y
 
-COPY ./tools/script.sh /etc/nginx/sites-available/
+COPY ./conf/script ./
 
-COPY ./tools/script.sh /
-
-CMD ["/script.sh"]
+CMD [ "sh", "script" ]
