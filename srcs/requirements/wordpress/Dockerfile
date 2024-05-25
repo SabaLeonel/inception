@@ -1,16 +1,13 @@
-FROM debian:buster
+FROM debian:latest
 
 
-RUN apt update -y 
+RUN apt-get update && apt-get upgrade && apt-get install -y \
+    php-fpm \
+    php-mysqli \
+    curl
 
-RUN apt install php-fpm php-mysql -y
+COPY www.conf /etc/php/8.2/fpm/pool.d/.
+COPY tools/script.sh .
+RUN chmod +x script.sh
 
-RUN apt install curl -y
-
-
-COPY ./tools/script.sh .
-COPY ./tools/wp-config.php .
-
-RUN chmod +x /script.sh
-
-CMD [ "./script.sh" ]
+CMD ["./script.sh"]
