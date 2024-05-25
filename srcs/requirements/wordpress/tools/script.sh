@@ -1,22 +1,37 @@
-#!/bin/sh
+echo "------------------------------- WORDPRESS START -----------------------------------"
 
-sed -i 's|PHP_PORT|'${PHP_PORT}'|g' /etc/php/7.3/fpm/pool.d/www.conf
+php-fpm7.4 -v
 
-if [ -f "/var/www/html/wordpress/wp-config.php" ]
+# Wait for mariadb to start
+while ! mariadb -u $MYSQL_USER --password=$MYSQL_PASS -h mariadb -P 3306 --silent; do
+    sleep 1
+    echo "Mariadb is not ready yet."
+done
 
-then
-  echo "Wordpress already configured."
+echo "------------------\n"
+mariadb -u $MYSQL_USER --password=$MYSQL_PASS -h mariadb -P 3306 -e "SHOW DATABASES;"
+echo "------------------\n"
 
+# Check if wordpress is already installed
+if [ -e /var/www/wordpress/wp-config.php ]
+then echo "wp-config already exists."
 else
-  wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-  chmod +x wp-cli.phar
-  mv wp-cli.phar /usr/local/bin/wp
-  wp core download --path=$WP_PATH --allow-root
-  wp config create --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=mariadb --path=$WP_PATH --skip-check --allow-root
-  wp core install --path=$WP_PATH --url=$DOMAIN_NAME --title=$WP_TITLE --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=$WP_EMAIL --skip-email --allow-root
-  wp theme install teluro --path=$WP_PATH --activate --allow-root
-  wp user create leon leon@le.on --role=author --path=$WP_PATH --user_pass=leon --allow-root
+    
+    # get wp-cli
+    wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp-cli.phar
+    mv wp-cli.phar /usr/local/bin/wp    
+
+    # Download wordpress
+    cd /var/www/wordpress
+    wp core download --allow-root
+
+    # Configuration de wordpress : connection a la base de donnees et creation des users de wordpress
+    wp config create --dbname=$MYSQL_DB_NAME --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASS --dbhost=$WP_HOST --dbcharset="utf8" --dbcollate="utf8_general_ci" --allow-root
+    wp core install --url=$DOMAIN_NAME --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
+    wp user create $WP_USER $WP_USER_EMAIL --role=author --user_pass=$WP_USER_PASS --allow-root
 
 fi
 
-/usr/sbin/php-fpm7.3 -F
+# Start php-fpm in the foreground
+php-fpm7.4 -F
