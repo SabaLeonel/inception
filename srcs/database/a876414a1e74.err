@@ -1,0 +1,31 @@
+240525 19:09:29 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql
+2024-05-25 19:09:29 0 [Note] Starting MariaDB 10.3.39-MariaDB-0+deb10u2 source revision ca001cf2048f0152689e1895e2dc15486dd0b1af as process 90
+2024-05-25 19:09:29 0 [Warning] Setting lower_case_table_names=2 because file system for /var/lib/mysql/ is case insensitive
+2024-05-25 19:09:29 0 [Note] InnoDB: Using Linux native AIO
+2024-05-25 19:09:29 0 [Note] InnoDB: Mutexes and rw_locks use GCC atomic builtins
+2024-05-25 19:09:29 0 [Note] InnoDB: Uses event mutexes
+2024-05-25 19:09:29 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+2024-05-25 19:09:29 0 [Note] InnoDB: Number of pools: 1
+2024-05-25 19:09:29 0 [Note] InnoDB: Using generic crc32 instructions
+2024-05-25 19:09:29 0 [Note] InnoDB: Initializing buffer pool, total size = 128M, instances = 1, chunk size = 128M
+2024-05-25 19:09:29 0 [Note] InnoDB: Completed initialization of buffer pool
+2024-05-25 19:09:29 0 [Note] InnoDB: If the mysqld execution user is authorized, page cleaner thread priority can be changed. See the man page of setpriority().
+2024-05-25 19:09:29 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=1625437
+2024-05-25 19:09:30 0 [Note] InnoDB: 128 out of 128 rollback segments are active.
+2024-05-25 19:09:30 0 [Note] InnoDB: Removed temporary tablespace data file: "ibtmp1"
+2024-05-25 19:09:30 0 [Note] InnoDB: Creating shared tablespace for temporary tables
+2024-05-25 19:09:30 0 [Note] InnoDB: Setting file './ibtmp1' size to 12 MB. Physically writing the file full; Please wait ...
+2024-05-25 19:09:30 0 [Note] InnoDB: File './ibtmp1' size is now 12 MB.
+2024-05-25 19:09:30 0 [Note] InnoDB: Waiting for purge to start
+2024-05-25 19:09:30 0 [Note] InnoDB: 10.3.39 started; log sequence number 1625446; transaction id 20
+2024-05-25 19:09:30 0 [Note] InnoDB: Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+2024-05-25 19:09:30 0 [Note] Plugin 'FEEDBACK' is disabled.
+2024-05-25 19:09:30 0 [Note] Recovering after a crash using tc.log
+2024-05-25 19:09:30 0 [Note] Starting crash recovery...
+2024-05-25 19:09:30 0 [Note] Crash recovery finished.
+2024-05-25 19:09:30 0 [Note] InnoDB: Buffer pool(s) load completed at 240525 19:09:30
+2024-05-25 19:09:30 0 [Note] Server socket created on IP: '0.0.0.0'.
+2024-05-25 19:09:30 0 [Note] Reading of all Master_info entries succeeded
+2024-05-25 19:09:30 0 [Note] Added new Master_info '' to hash table
+2024-05-25 19:09:30 0 [Note] /usr/sbin/mysqld: ready for connections.
+Version: '10.3.39-MariaDB-0+deb10u2'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  Debian 10

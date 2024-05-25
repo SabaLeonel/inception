@@ -1,12 +1,22 @@
-FROM debian:latest
+FROM    debian:buster
 
-RUN apt-get update && apt-get upgrade && apt-get install -y \
-    mariadb-server
+RUN     apt-get update -yq && \
+        apt-get upgrade -y && \
+        apt-get install mariadb-server \
+        mariadb-client -y && \
+        mkdir -p /var/run/mysqld && \
+        chown -R mysql:mysql /var/run/mysqld && \
+        chown -R mysql:mysql /etc/mysql/
 
-COPY 50-server.cnf /etc/mysql/mariadb.conf.d/
-COPY init.sql /etc/mysql/init.sql
-COPY tools/script.sh .
+COPY    ./tools/script.sh /tmp/
+COPY    ./conf/init.sql /tmp/
+COPY    ./conf/my.cnf /etc/mysql
 
-RUN mkdir /run/mysqld && chmod +x script.sh
+RUN     chown -R mysql:mysql /tmp/ && \
+        chown -R mysql:mysql /etc/mysql
 
-CMD ["./script.sh"]
+#EXPOSE  3306
+
+USER    mysql
+
+ENTRYPOINT ["sh","/tmp/script.sh"]

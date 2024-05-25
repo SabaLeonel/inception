@@ -1,13 +1,21 @@
-FROM debian:latest
+FROM	debian:buster
 
-
-RUN apt-get update && apt-get upgrade && apt-get install -y \
+RUN     apt update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y php \
+    php-mysql \
+    php-cli \
+    php-mbstring \
     php-fpm \
-    php-mysqli \
-    curl
+    php-gettext \
+    mariadb-client \
+    wget && \
+    rm -rf /etc/php/7.3/fpm/pool.d/www.conf && \
+    mkdir -p /run/php
 
-COPY www.conf /etc/php/8.2/fpm/pool.d/.
-COPY tools/script.sh .
-RUN chmod +x script.sh
+COPY    ./conf/www.conf /etc/php/7.3/fpm/pool.d/
+COPY    ./tools/script.sh /tmp/
 
-CMD ["./script.sh"]
+RUN     chmod +x /tmp/script.sh
+
+ENTRYPOINT ["sh", "/tmp/script.sh"]
