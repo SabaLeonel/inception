@@ -2,12 +2,6 @@ echo "------------------------------- WORDPRESS START --------------------------
 
 php-fpm7.4 -v
 
-# Wait for mariadb to start
-while ! mariadb -u $MYSQL_USER --password=$MYSQL_PASS -h mariadb -P 3306 --silent; do
-    sleep 1
-    echo "Mariadb is not ready yet."
-done
-
 echo "------------------\n"
 mariadb -u $MYSQL_USER --password=$MYSQL_PASS -h mariadb -P 3306 -e "SHOW DATABASES;"
 echo "------------------\n"

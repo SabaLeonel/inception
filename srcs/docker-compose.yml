@@ -1,9 +1,31 @@
-version: '3'
+version: '3.8'
 
 services:
+  nginx:
+    image: nginx
+    build: requirements/nginx/
+    container_name: nginx
+    restart: on-failure
+    depends_on:
+      - wordpress
+    volumes:
+      - ./web:/var/www/html
+    ports:
+      - "443:443"
+    env_file:
+      - .env
+    networks:
+      - main_network
   mariadb:
     image: mariadb
-    build: requirements/mariadb/
+    build:
+      dockerfile: Dockerfile
+      context: requirements/mariadb/
+      args:
+        - MYSQL_DB_NAME=${MYSQL_DB_NAME}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASS=${MYSQL_PASS}
+        - MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS}
     container_name: mariadb
     restart: on-failure
     volumes:
@@ -21,21 +43,6 @@ services:
     restart: on-failure
     volumes:
       - ./web:/var/www/html
-    env_file:
-      - .env
-    networks:
-      - main_network
-  nginx:
-    image: nginx
-    build: requirements/nginx/
-    container_name: nginx
-    restart: on-failure
-    depends_on:
-      - wordpress
-    volumes:
-      - ./web:/var/www/html
-    ports:
-      - "443:443"
     env_file:
       - .env
     networks:

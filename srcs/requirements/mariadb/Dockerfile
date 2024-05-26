@@ -1,16 +1,18 @@
 FROM    debian:bullseye
 
-RUN     apt-get update && apt-get upgrade -y
-RUN     apt-get install -y mariadb-server 
 
-RUN     mkdir -p /run/mysqld /var/lib/mysql
+ARG MYSQL_DB_NAME
+ARG MYSQL_USER
+ARG MYSQL_PASS
+ARG MYSQL_ROOT_PASS
 
-COPY    ./conf/50-server.cnf /etc/mysql/50-server.cnf
+RUN apt -y update && apt -y upgrade && apt -y install mariadb-server
 
-COPY    ./tools/script.sh /usr/local/script.sh
-RUN     chmod +x /usr/local/script.sh
+COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./tools/script.sh /tmp/script.sh
 
+RUN service mariadb start && sh /tmp/script.sh
 
-EXPOSE  3306
+EXPOSE 3306
 
-ENTRYPOINT ["sh","/usr/local/script.sh"]
+CMD ["mysqld"]
