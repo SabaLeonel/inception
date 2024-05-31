@@ -1,46 +1,39 @@
+include ./srcs/.env
 PATH=./srcs
 
 
-all : up
+all : create_vol build
 
 create_vol:
-	mkdir -p $(HOME)/data/mysql
-	mkdir -p $(HOME)/data/html
-	sudo chown -R $(USER) $(HOME)/data
-	sudo chmod -R 777 $(HOME)/data
+	@echo "Creating the volumes for the database and the web server"
+	mkdir -p $(VOLUME_PATH)/database
+	mkdir -p $(VOLUME_PATH)/web
 
+delete_vol:
+	@echo "Deleting the volumes for the database and the web server"
+	rm -rf $(VOLUME_PATH)/database
+	rm -rf $(VOLUME_PATH)/web
+up
 
-up : 
-	@docker-compose -f ./srcs/docker-compose.yml up -d
+build : 
+	docker-compose -f ./srcs/docker-compose.yml -p Inception up --build
 
 down : 
-	@docker-compose -f ./srcs/docker-compose.yml down
+	docker-compose -f ./srcs/docker-compose.yml -p Inception down
 
 stop : 
-	@docker-compose -f ./srcs/docker-compose.yml stop
+	docker-compose -f ./srcs/docker-compose.yml -p Inception stop
 
 start : 
-	@docker-compose -f ./srcs/docker-compose.yml start
+	docker-compose -f ./srcs/docker-compose.yml -p Inception start
 
-build :
-	@docker-compose -f ./srcs/docker-compose.yml build
+erase: 
+	docker stop $$(docker ps -qa); docker rm $$(docker ps -qa); docker rmi -f $$(docker images -qa); docker volume rm $$(docker volume ls -q); docker network rm $$(docker network ls -q) 2>/dev/null
 
-# remove:
-# 	sudo chown -R $(USER) $(PATH)/data
-# 	sudo chmod -R 777 $(PATH)/data
-# 	rm -rf $(HOME)/data
-# 	docker volume prune -f
-# 	docker volume rm srcs_wordpress
-# 	docker volume rm srcs_mariadb
-# 	docker container prune -f
+purge:
+	docker system prune -f
 
-delete:
-	cd srcs && docker-compose stop nginx
-	cd srcs && docker-compose stop wordpress
-	cd srcs && docker-compose stop mariadb
-	docker system prune -a
-
-re: remove delete build up
+fclean: erase purge
 
 logs:
 	cd srcs && docker-compose logs mariadb wordpress nginx

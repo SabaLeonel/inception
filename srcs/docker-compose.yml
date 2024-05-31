@@ -9,11 +9,10 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - ./web:/var/www/html
+      - web:/var/www/html
     ports:
       - "443:443"
-    env_file:
-      - .env
+    env_file: .env
     networks:
       - main_network
   mariadb:
@@ -28,8 +27,10 @@ services:
         - MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS}
     container_name: mariadb
     restart: on-failure
+    expose:
+      - "3306"
     volumes:
-      - ./database:/var/lib/mysql
+      - database:/var/lib/mysql
     networks:
       - main_network
     env_file:
@@ -40,15 +41,32 @@ services:
     container_name: wordpress
     depends_on:
       - mariadb
+    expose:
+      - "9000"
     restart: on-failure
     volumes:
-      - ./web:/var/www/html
+      - web:/var/www/html
     env_file:
       - .env
     networks:
       - main_network
 
-
 networks:
   main_network:
-    name: main_network
+    driver: bridge
+
+volumes:
+web:
+  name: web
+  driver: local
+  driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUME_PATH}/web
+  database:
+    name: database
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUME_PATH}/database
