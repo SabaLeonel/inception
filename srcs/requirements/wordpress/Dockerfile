@@ -1,28 +1,22 @@
-FROM	debian:bullseye
+FROM	debian:buster
 
-RUN     apt update && apt upgrade -y
-RUN     apt-get install -y wget
+RUN     apt update -y && apt upgrade -y
+RUN     apt-get install wget -y
 
 #Installation of php, fpm, mysql
-RUN     apt-get -y install \
-        php7.4 \
+RUN     apt-get install -y php7.3 \
         php-fpm \
         php-mysql \
         mariadb-client
 
-# Create the directory for the website and set the permissions
-RUN     mkdir -p /var/www/wordpress
+COPY	./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+
+COPY	./tools/script.sh /tmp/script.sh
+
+EXPOSE	9000
+
 RUN     mkdir -p /run/php
-RUN     chown -R www-data:www-data /var/www
 
-EXPOSE 9000
-# assign the rights to the folder
-RUN     chmod -R 755 /var/www
+RUN	chmod +x /tmp/script.sh
 
-# Copy the configuration files
-COPY    ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
-COPY    ./tools/script.sh /usr/local/script.sh
-RUN     chmod +x /usr/local/script.sh
-
-
-ENTRYPOINT ["sh", "/usr/local/script.sh"]
+ENTRYPOINT ["/tmp/script.sh"]

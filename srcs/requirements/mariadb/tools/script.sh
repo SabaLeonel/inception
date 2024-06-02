@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cat << EOF > /tmp/db_config.sql
 CREATE DATABASE IF NOT EXISTS $MYSQL_DB_NAME;

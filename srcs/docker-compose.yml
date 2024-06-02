@@ -9,64 +9,64 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - web:/var/www/html
+      - ../data/web:/var/www/html
     ports:
       - "443:443"
     env_file: .env
     networks:
       - main_network
   mariadb:
+    container_name: mariadb
     image: mariadb
     build:
+      context: ./requirements/mariadb
       dockerfile: Dockerfile
-      context: requirements/mariadb/
       args:
         - MYSQL_DB_NAME=${MYSQL_DB_NAME}
         - MYSQL_USER=${MYSQL_USER}
         - MYSQL_PASS=${MYSQL_PASS}
         - MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS}
-    container_name: mariadb
-    restart: on-failure
     expose:
       - "3306"
     volumes:
-      - database:/var/lib/mysql
+      - ../data/database:/var/lib/mariadb
+    restart: always
     networks:
       - main_network
-    env_file:
-      - .env
+    env_file: .env
   wordpress:
-    image: wordpress
-    build: requirements/wordpress/
     container_name: wordpress
+    image: wordpress
+    build:
+      context: ./requirements/wordpress
     depends_on:
       - mariadb
     expose:
       - "9000"
     restart: on-failure
     volumes:
-      - web:/var/www/html
+      - ../data/web:/var/www/html
     env_file:
       - .env
     networks:
       - main_network
-
+      
 networks:
   main_network:
     driver: bridge
 
 volumes:
-web:
-  name: web
-  driver: local
-  driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: ${VOLUME_PATH}/web
   database:
     name: database
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: ${VOLUME_PATH}/database
+      device: ../data/database
+  web:
+    name: web
+    driver: local
+    driver_opts:
+        type: 'none'
+        o: 'bind'
+        device: ../data/web

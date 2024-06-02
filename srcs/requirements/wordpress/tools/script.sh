@@ -1,31 +1,53 @@
-echo "------------------------------- WORDPRESS START -----------------------------------"
+#!/bin/bash
 
-php-fpm7.4 -v
+# pour plus d infor sur l installation et l utilisation de wp-cli :
+# https://make.wordpress.org/cli/handbook/guides/installing/
 
-echo "------------------\n"
-mariadb -u $MYSQL_USER --password=$MYSQL_PASS -h mariadb -P 3306 -e "SHOW DATABASES;"
-echo "------------------\n"
+# Attendre que la base de données soit prête
+#sleep 10
 
-# Check if wordpress is already installed
-if [ -e /var/www/wordpress/wp-config.php ]
-then echo "wp-config already exists."
-else
-    
-    # get wp-cli
-    wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-    chmod +x wp-cli.phar
-    mv wp-cli.phar /usr/local/bin/wp    
+# Chemin vers WordPress
+WP_PATH='/var/www/html'
 
-    # Download wordpress
-    cd /var/www/wordpress
-    wp core download --allow-root
+# Vérifier si wp-config.php n'existe pas encore
+if [ ! -e ${WP_PATH}/wp-config.php ]; then
+  # Télécharger wp-cli
+  wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  chmod +x wp-cli.phar
 
-    # Configuration de wordpress : connection a la base de donnees et creation des users de wordpress
-    wp config create --dbname=$MYSQL_DB_NAME --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASS --dbhost=$WP_HOST --dbcharset="utf8" --dbcollate="utf8_general_ci" --allow-root
-    wp core install --url=$DOMAIN_NAME --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
-    wp user create $WP_USER $WP_USER_EMAIL --role=author --user_pass=$WP_USER_PASS --allow-root
+  # Télécharger WordPress
+  ./wp-cli.phar core download --allow-root --path=${WP_PATH}
 
+  # Créer le fichier de configuration wp-config.php
+  ./wp-cli.phar config create --allow-root \
+    --dbname=${MYSQL_DB_NAME} \
+    --dbuser=${MYSQL_USER} \
+    --dbpass=${MYSQL_PASS} \
+    --dbhost=${MYSQL_HOST} \
+    --path=${WP_PATH}
+
+  # Attendre un peu pour s'assurer que tout est prêt
+  sleep 2
+
+  # Installer WordPress
+  ./wp-cli.phar core install --allow-root \
+    --url=${WP_HOME_URL} \
+    --title=${WP_BLOG_TITLE} \
+    --admin_user=${WP_ADMIN_USER} \
+    --admin_password=${WP_ADMIN_PASS} \
+    --admin_email=${WP_ADMIN_EMAIL} \
+    --skip-email \
+    --path=${WP_PATH}
+
+  # Attendre un peu pour s'assurer que tout est prêt
+  sleep 2
+
+  # Créer un utilisateur WordPress
+  ./wp-cli.phar user create --allow-root \
+    --role=author ${WP_USER} ${WP_USER_EMAIL} \
+    --user_pass=${WP_USER_PASS} \
+    --path=${WP_PATH}
 fi
 
-# Start php-fpm in the foreground
-php-fpm7.4 -F
+# Démarrer PHP-FPM
+exec php-fpm7.3 -F
