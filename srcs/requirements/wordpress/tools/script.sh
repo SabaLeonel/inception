@@ -20,7 +20,7 @@ if [ ! -e ${WP_PATH}/wp-config.php ]; then
 
   # Créer le fichier de configuration wp-config.php
   ./wp-cli.phar config create --allow-root \
-    --dbname=${MYSQL_DB_NAME} \
+    --dbname=${MYSQL_DB} \
     --dbuser=${MYSQL_USER} \
     --dbpass=${MYSQL_PASS} \
     --dbhost=${MYSQL_HOST} \

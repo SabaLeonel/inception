@@ -1,9 +1,7 @@
-FROM	debian:buster
+FROM    debian:buster
 
-RUN     apt update -y && apt upgrade -y
-RUN     apt-get install wget -y
+RUN     apt update -y && apt upgrade -y && apt-get install wget -y
 
-#Installation of php, fpm, mysql
 RUN     apt-get install -y php7.3 \
         php-fpm \
         php-mysql \
@@ -17,6 +15,6 @@ EXPOSE	9000
 
 RUN     mkdir -p /run/php
 
-RUN	chmod +x /tmp/script.sh
+RUN     chmod +x /tmp/script.sh
 
 ENTRYPOINT ["/tmp/script.sh"]

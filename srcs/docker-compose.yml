@@ -3,18 +3,20 @@ version: '3.8'
 services:
   nginx:
     image: nginx
-    build: requirements/nginx/
+    build: 
+      context: ./requirements/nginx
     container_name: nginx
     restart: on-failure
     depends_on:
       - wordpress
     volumes:
-      - ../data/web:/var/www/html
+      - ../data/wordpress:/var/www/html
     ports:
       - "443:443"
     env_file: .env
     networks:
       - main_network
+
   mariadb:
     container_name: mariadb
     image: mariadb
@@ -22,18 +24,19 @@ services:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
       args:
-        - MYSQL_DB_NAME=${MYSQL_DB_NAME}
-        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_DB=${MYSQL_DB}
         - MYSQL_PASS=${MYSQL_PASS}
+        - MYSQL_USER=${MYSQL_USER}
         - MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS}
     expose:
       - "3306"
     volumes:
-      - ../data/database:/var/lib/mariadb
+      - ../data/mariadb:/var/lib/mariadb
     restart: always
     networks:
       - main_network
     env_file: .env
+
   wordpress:
     container_name: wordpress
     image: wordpress
@@ -43,9 +46,9 @@ services:
       - mariadb
     expose:
       - "9000"
-    restart: on-failure
+    restart: always
     volumes:
-      - ../data/web:/var/www/html
+      - ../data/wordpress:/var/www/html
     env_file:
       - .env
     networks:

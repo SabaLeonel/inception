@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y nginx
 RUN apt-get install -y openssl
 
-# Install openssl and generate a self-signed certificate
+
 RUN mkdir -p /etc/nginx/ssl
 RUN openssl req -x509 -nodes \
     -out /etc/nginx/ssl/nginx-certificate.crt \
@@ -14,5 +14,5 @@ RUN openssl req -x509 -nodes \
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 443
-# Start nginx and keep it running
+
 CMD ["nginx", "-g", "daemon off;"]
