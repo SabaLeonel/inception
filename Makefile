@@ -1,10 +1,13 @@
 include ./srcs/.env
 
-PATH= ./srcs
+PATH := ./srcs
+DOCKER_COMPOSE := /docker-compose.yml
+PROJECT_NAME := Inception
 
-DOCKER_COMPOSE_BUILD := docker compose -f ./srcs/docker-compose.yml -p inception up --build
+WORDPRESS_VOL := $(VOLUME_PATH)/wordpress
+MARIADB_VOL := $(VOLUME_PATH)/mariadb
 
-
+DOCKER_COMPOSE_CMD := docker compose -f $(PATH)$(DOCKER_COMPOSE) -p $(PROJECT_NAME)
 
 all : create_vol build
 
@@ -18,19 +21,26 @@ delete_vol:
 	rm -rf $(VOLUME_PATH)/database
 	rm -rf $(VOLUME_PATH)/web
 
-build : 
-	$(DOCKER_COMPOSE_BUILD)
+up:
+	@echo "Starting the containers"
+    $(DOCKER_COMPOSE_CMD) up
 
-down : 
-	docker compose -f ./srcs/docker-compose.yml -p inception down
+build: 
+	$(DOCKER_COMPOSE_CMD) up --build
 
-stop : 
-	docker compose -f ./srcs/docker-compose.yml -p inception stop
+start:
+	$(DOCKER_COMPOSE_CMD) start
 
-start : 
-	docker compose -f ./srcs/docker-compose.yml -p inception start
+stop: 
+	$(DOCKER_COMPOSE_CMD) stop
 
-erase: 
+up:
+    $(DOCKER_COMPOSE_CMD) up
+
+down down_vol:
+	$(DOCKER_COMPOSE_CMD) $@
+
+erase:
 	docker stop $$(docker ps -qa); docker rm $$(docker ps -qa); docker rmi -f $$(docker images -qa); docker volume rm $$(docker volume ls -q); docker network rm $$(docker network ls -q) 2>/dev/null
 
 purge:
@@ -38,7 +48,4 @@ purge:
 
 fclean: erase purge
 
-logs:
-	cd srcs && docker-compose logs mariadb wordpress nginx
-
-.PHONY: all create_vol delete_vol build down stop start erase purge fclean logs
+start: up
