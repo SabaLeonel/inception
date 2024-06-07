@@ -10,7 +10,7 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - ../data/wordpress:/var/www/html
+      - wordpress:/var/www/html
     ports:
       - "443:443"
     env_file: .env
@@ -31,7 +31,7 @@ services:
     expose:
       - "3306"
     volumes:
-      - ../data/mariadb:/var/lib/mariadb
+      - mariadb:/var/lib/mariadb
     restart: always
     networks:
       - main_network
@@ -48,7 +48,7 @@ services:
       - "9000"
     restart: always
     volumes:
-      - ../data/wordpress:/var/www/html
+      - wordpress:/var/www/html
     env_file:
       - .env
     networks:
@@ -59,17 +59,17 @@ networks:
     driver: bridge
 
 volumes:
-  database:
-    name: database
+  wordpress:
+    name: wordpress
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: ../data/database
-  web:
-    name: web
+      device: ${VOLUME_PATH}/web
+  mariadb:
+    name: mariadb
     driver: local
     driver_opts:
-        type: 'none'
-        o: 'bind'
-        device: ../data/web
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUME_PATH}/database
