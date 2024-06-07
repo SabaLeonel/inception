@@ -1,13 +1,13 @@
 include ./srcs/.env
 
-PATH := ./srcs
+DOCKER_SRCS := ./srcs
 DOCKER_COMPOSE := /docker-compose.yml
 PROJECT_NAME := Inception
 
 WORDPRESS_VOL := $(VOLUME_PATH)/wordpress
 MARIADB_VOL := $(VOLUME_PATH)/mariadb
 
-DOCKER_COMPOSE_CMD := docker compose -f $(PATH)$(DOCKER_COMPOSE) -p $(PROJECT_NAME)
+DOCKER_COMPOSE_CMD := docker compose -f $(DOCKER_SRCS)$(DOCKER_COMPOSE) -p $(PROJECT_NAME)
 
 all : create_vol build
 
@@ -23,7 +23,7 @@ delete_vol:
 
 up:
 	@echo "Starting the containers"
-    $(DOCKER_COMPOSE_CMD) up
+	$(DOCKER_COMPOSE_CMD) up
 
 build: 
 	$(DOCKER_COMPOSE_CMD) up --build
@@ -33,9 +33,6 @@ start:
 
 stop: 
 	$(DOCKER_COMPOSE_CMD) stop
-
-up:
-    $(DOCKER_COMPOSE_CMD) up
 
 down down_vol:
 	$(DOCKER_COMPOSE_CMD) $@
